@@ -1,0 +1,31 @@
+ARG NGINX_VERSION=1.26.2
+ARG NGINX_IMAGE=nginx
+ARG VERSION=alpine
+
+FROM $NGINX_IMAGE:$NGINX_VERSION-alpine
+
+FROM $NGINX_IMAGE:$NGINX_VERSION-alpine
+
+RUN apk upgrade --no-cache && \
+    apk update --no-cache
+
+RUN apk add -u curl
+
+# Clean nginx configs
+RUN rm /etc/nginx/conf.d/*
+
+# Create empty web dir to satiate nginx
+RUN mkdir -p /var/www/html/public/
+
+COPY ./docker/servicesReverseProxy/error /var/www/error
+COPY ./docker/servicesReverseProxy/nginx /etc/nginx
+
+# Entrypoint script
+COPY ./docker/servicesReverseProxy/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+#RUN chmod -R 777 /usr/local/bin /usr/bin
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh /usr/bin
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]
+

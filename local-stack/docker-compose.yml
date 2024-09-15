@@ -1,0 +1,17 @@
+services:
+  # EDGE ROUTER
+  traefik:
+    image: traefik:v2.9
+    command:
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.traefik.address=:8080"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+    ports:
+      - "70:80"
+      - "7070:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - cloud_net

@@ -1,0 +1,35 @@
+services:
+  userservice:
+    container_name: user-service
+    image: user-service:latest
+    build:
+      context: .
+      dockerfile: ./docker/services/UserService/dockerfile
+    volumes:
+      - ./services/UserService:/app
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - waybuddy-net
+    command: ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:5000"]
+
+  services_reverse_proxy:
+    build:
+      context: .
+      dockerfile: ./docker/servicesReverseProxy/dockerfile
+    container_name: services-nginx-reverse-proxy
+    image: services-nginx-reverse-proxy:latest
+    ports:
+      - 80:80
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.reverse_proxy.rule=Host(`apps.waybuddy.com`)"
+    #   - "traefik.http.routers.reverse_proxy.entrypoints=web"
+    networks:
+      - waybuddy-net
+
+networks:
+  waybuddy-net:
+    driver: bridge
+    name: waybuddy-net
+    attachable: true
